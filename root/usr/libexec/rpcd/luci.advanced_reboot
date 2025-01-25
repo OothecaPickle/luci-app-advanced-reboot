@@ -31,27 +31,14 @@ alt_partition_mount() {
 		ubidetach -m "$op_ubi"
 		return 1
 	fi
-	ubiblock --create "/dev/ubi${ubi_dev}_${ubi_vol}" && \
 	mount -t squashfs -r "/dev/ubiblock${ubi_dev}_${ubi_vol}" /var/alt_rom
 }
 
 alt_partition_unmount() {
-	local mtdCount i=0 op_ubi="$1" ubi_vol="${2:-0}"
-	mtdCount="$(ubinfo | grep 'Present UBI devices' | tr ',' '\n' | grep -c 'ubi')"
-	[ -z "$mtdCount" ] && mtdCount=10
+	local op_ubi="$1"
 	[ -d /var/alt_rom ] && umount /var/alt_rom
-	while [ "$i" -le "$mtdCount" ]; do
-		if [ ! -e "/sys/devices/virtual/ubi/ubi${i}/mtd_num" ]; then
-			break
-		fi
-		ubi_mtd="$(cat /sys/devices/virtual/ubi/ubi${i}/mtd_num)"
-		if [ -n "$ubi_mtd" ] && [ "$ubi_mtd" = "$op_ubi" ]; then
-			ubiblock --remove /dev/ubi${i}_${ubi_vol}
-			ubidetach -m "$op_ubi"
-			rm -rf /var/alt_rom
-		fi
-		i=$((i + 1))
-	done
+	ubidetach -m "$op_ubi"
+	rm -rf /var/alt_rom
 }
 
 get_main_partition_os_info(){
@@ -68,7 +55,7 @@ get_main_partition_os_info(){
 get_alt_partition_os_info(){
 	local op_info op_ubi="$1" vendor_name="$2" ubi_vol="$3"
 	logger "attempting to mount alternative partition (mtd${op_ubi})"
-	alt_partition_unmount "$op_ubi" "$ubi_vol"
+	alt_partition_unmount "$op_ubi"
 	alt_partition_mount "$op_ubi" "$ubi_vol"
 	if [ -s "/var/alt_rom/etc/os-release" ]; then
 		op_info="$(. /var/alt_rom/etc/os-release && echo "$PRETTY_NAME")"
@@ -80,7 +67,7 @@ get_alt_partition_os_info(){
 		op_info="${vendor_name:+$vendor_name }$(awk -F: '$1=="soft_ver" { print $2 ;}' /var/alt_rom/etc/partition_config/soft-version)"
 	fi
 	logger "attempting to unmount alternative partition (mtd${op_ubi})"
-	alt_partition_unmount "$op_ubi" "$ubi_vol"
+	alt_partition_unmount "$op_ubi"
 	echo "$op_info"
 }
 
