@@ -11,6 +11,6 @@
 	"bootEnv1Partition1Value": 1,
 	"bootEnv1Partition2Value": 2,
 	"bootEnv2": "msmparts",
-	"bootEnv2Partition1Value": null,
+	"bootEnv2Partition1Value": " ",
 	"bootEnv2Partition2Value": "0x1db00000@0x4a00000(fs)"
 }
