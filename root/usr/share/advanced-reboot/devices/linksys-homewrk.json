@@ -1,0 +1,45 @@
+{
+	"device": {
+		"vendor": "Linksys",
+		"model": "HomeWRK",
+		"board": [
+			"linksys,homewrk"
+		]
+	},
+	"commands": {
+		"params": [
+			"switch_part",
+			"switch_num",
+			"msmparts"
+		],
+		"get": "fw_printenv",
+		"set": "fw_setenv",
+		"save": null
+	},
+	"partitions": [
+		{
+			"number": 1,
+			"param_values": [
+				1,
+				0,
+				""
+			],
+			"firmware": {
+				"rootfs": "mtd22",
+				"rootfs_ubi_volume": "1"
+			}
+		},
+		{
+			"number": 2,
+			"param_values": [
+				2,
+				0,
+				"0x1db00000@0x4a00000(fs)"
+			],
+			"firmware": {
+				"rootfs": "mtd23",
+				"rootfs_ubi_volume": "1"
+			}
+		}
+	]
+}
